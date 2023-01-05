@@ -1,14 +1,13 @@
+from rest_framework import serializers
+
 from .models import (
     Brand,
     Category,
     Media,
     Product,
     ProductAttributeValue,
-    ProductAttributeValues,
     ProductInventory,
-    ProductType,
 )
-from rest_framework import serializers
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -81,18 +80,18 @@ class ProductInventorySerializer(serializers.ModelSerializer):
         read_only = True
 
 
-# class ProductInventorySearchSerializer(serializers.ModelSerializer):
+class ProductInventorySearchSerializer(serializers.ModelSerializer):
 
-#     product = ProductSerializer(many=False, read_only=True)
-#     brand = BrandSerializer(many=False, read_only=True)
+    product = ProductSerializer(many=False, read_only=True)
+    brand = BrandSerializer(many=False, read_only=True)
 
-#     class Meta:
-#         model = ProductInventory
-#         fields = [
-#             "id",
-#             "sku",
-#             "store_price",
-#             "is_default",
-#             "product",
-#             "brand",
-#         ]
+    class Meta:
+        model = ProductInventory
+        fields = [
+            "id",
+            "sku",
+            "store_price",
+            "is_default",
+            "product",
+            "brand",
+        ]
