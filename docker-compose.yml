@@ -3,7 +3,7 @@ version: "3.8"
 services:
   web:
     restart: always
-    container_name: web_ecommercev2
+    container_name: django
     build:
       context: .
     command: python manage.py runserver 0.0.0.0:8000
@@ -17,7 +17,7 @@ services:
 
   pgdb:
     # profiles: [ "dev" ]
-    container_name: pgdb_ecommerce
+    container_name: pgdb_ecart
     image: postgres
     restart: always
     ports:
@@ -28,7 +28,7 @@ services:
       - POSTGRES_PASSWORD=postgres
 
   elasticsearch:
-    container_name: search
+    container_name: elasticsearch
     image: elasticsearch:7.14.2
     environment:
       - cluster.name=ecommerce-elasticsearch
@@ -48,36 +48,36 @@ services:
     image: redis:alpine
     ports:
       - "6379:6379"
-  # celery:
-  #   container_name: celery_ecommercev2
-  #   restart: always
-  #   build:
-  #     context: .
-  #   command: celery -A ecommerce worker -l info
-  #   environment:
-  #     - DEBUG=1
-  #     - CELERY_BROKER=redis://redis:6379/0
-  #     - CELERY_BACKEND=redis://redis:6379:0
-  #   depends_on:
-  #     - redis
-  #   volumes:
-  #     - .:/usr/src/app/
-  # celery-beat:
-  #   container_name: celery_beat_ecommerce
-  #   restart: always
-  #   build:
-  #     context: .
-  #   command: celery -A ecommerce beat -l info
-  #   depends_on:
-  #     - redis
-  #     - celery
-  #   volumes:
-  #     - .:/usr/src/app/
-  # flower:
-  #   container_name: flower_ecommerce
-  #   image: mher/flower
-  #   environment:
-  #     - CELERY_BROKER_URL=redis://redis:6379/0
-  #     - FLOWER_PORT=8888
-  #   ports:
-  #     - 8888:8888
+  celery:
+    container_name: celery
+    restart: always
+    build:
+      context: .
+    command: celery -A core worker -l info
+    environment:
+      - DEBUG=1
+      - CELERY_BROKER=redis://redis:6379/0
+      - CELERY_BACKEND=redis://redis:6379:0
+    depends_on:
+      - redis
+    volumes:
+      - .:/usr/src/app/
+  celery-beat:
+    container_name: celery_beat
+    restart: always
+    build:
+      context: .
+    command: celery -A core beat -l info
+    depends_on:
+      - redis
+      - celery
+    volumes:
+      - .:/usr/src/app/
+  flower:
+    container_name: flower
+    image: mher/flower
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - FLOWER_PORT=8888
+    ports:
+      - 8888:8888

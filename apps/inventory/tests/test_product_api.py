@@ -13,16 +13,15 @@ def test_get_product_by_category(api_client, single_product):
             "web_id": product.web_id,
         }
     ]
-
     assert response.status_code == 200
     assert response.data == expected_json
 
 
-def test_product_inventory_by_web_id(
+def test_get_inventory_by_web_id(
     api_client, single_sub_product_with_media_and_attributes
 ):
-
     fixture = convert_to_dot_notation(single_sub_product_with_media_and_attributes)
+
     endpoint = f"/api/inventory/{fixture.inventory.product.web_id}/"
     response = api_client().get(endpoint)
 
@@ -37,7 +36,7 @@ def test_product_inventory_by_web_id(
                 "name": fixture.inventory.product.name,
                 "web_id": fixture.inventory.product.web_id,
             },
-            "is_on_sale": fixture.inventory.is_on_sale,
+            "promotion_price": None,
             "weight": fixture.inventory.weight,
             "media": [
                 {

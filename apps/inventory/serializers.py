@@ -1,6 +1,9 @@
+from attr import attributes
+from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Q
 from rest_framework import serializers
 
-from .models import (
+from apps.inventory.models import (
     Brand,
     Category,
     Media,
@@ -8,6 +11,22 @@ from .models import (
     ProductAttributeValue,
     ProductInventory,
 )
+from apps.promotion.models import Promotion
+
+
+class ProductAttributeValueSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductAttributeValue
+        depth = 2
+        exclude = ["id"]
+        read_only = True
+
+
+class BrandSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Brand
+        fields = ["name"]
+        read_only = True
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -25,13 +44,6 @@ class ProductSerializer(serializers.ModelSerializer):
         editable = False
 
 
-class BrandSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Brand
-        fields = ["name"]
-        read_only = True
-
-
 class ProductMediaSerializer(serializers.ModelSerializer):
     img_url = serializers.SerializerMethodField()
 
@@ -45,14 +57,6 @@ class ProductMediaSerializer(serializers.ModelSerializer):
         return obj.img_url.url
 
 
-class ProductAttributeValueSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ProductAttributeValue
-        depth = 2
-        exclude = ["id"]
-        read_only = True
-
-
 class ProductInventorySerializer(serializers.ModelSerializer):
 
     product = ProductSerializer(many=False, read_only=True)
@@ -61,6 +65,7 @@ class ProductInventorySerializer(serializers.ModelSerializer):
     attributes = ProductAttributeValueSerializer(
         source="attribute_values", many=True, read_only=True
     )
+    promotion_price = serializers.SerializerMethodField()
 
     class Meta:
         model = ProductInventory
@@ -71,13 +76,23 @@ class ProductInventorySerializer(serializers.ModelSerializer):
             "is_default",
             "brand",
             "product",
-            "is_on_sale",
             "weight",
             "media",
             "attributes",
             "product_type",
+            "promotion_price",
         ]
         read_only = True
+
+    def get_promotion_price(self, obj):
+
+        try:
+            x = Promotion.products_on_promotion.through.objects.get(
+                Q(promotion_id__is_active=True) & Q(product_inventory_id=obj.id)
+            )
+            return x.promo_price
+        except ObjectDoesNotExist:
+            return None
 
 
 class ProductInventorySearchSerializer(serializers.ModelSerializer):

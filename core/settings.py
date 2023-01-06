@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 from pathlib import Path
 
+from celery.schedules import crontab
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -40,6 +42,7 @@ INSTALLED_APPS = [
     # local apps
     "apps.inventory",
     "apps.demo",
+    "apps.promotion",
     # external apps
     "rest_framework",
     "django_elasticsearch_dsl",
@@ -145,4 +148,14 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 10,
 }
 
-ELASTICSEARCH_DSL = {"default": {"hosts": "localhost:9200"}}
+ELASTICSEARCH_DSL = {"default": {"hosts": "elasticsearch"}}
+
+CELERY_BROKER_URL = "redis://redis:6379"
+CELERY_RESULT_BACKEND = "redis://redis:6379"
+
+CELERY_BEAT_SCHEDULE = {
+    "sample_task": {
+        "task": "apps.promotion.promotion_management",
+        "schedule": crontab(minute="0", hour="1"),
+    },
+}

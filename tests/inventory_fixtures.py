@@ -1,13 +1,13 @@
 import pytest
 from apps.inventory.models import (
-    Category,
-    Product,
-    ProductInventory,
-    ProductType,
     Brand,
+    Category,
+    Media,
+    Product,
     ProductAttribute,
     ProductAttributeValue,
-    Media,
+    ProductInventory,
+    ProductType,
 )
 
 
@@ -54,19 +54,6 @@ def category_with_multiple_children(db):
 
 
 @pytest.fixture
-def single_product(db, category_with_child):
-    product = Product.objects.create(
-        web_id="123456789",
-        name="default",
-        slug="default",
-        category=category_with_child,
-        is_active=True,
-    )
-
-    return product
-
-
-@pytest.fixture
 def product_type(db, product_attribute):
     product_type = ProductType.objects.create(name="default")
     product_attribute = product_attribute
@@ -74,12 +61,6 @@ def product_type(db, product_attribute):
     product_type.product_type_attributes.add(product_attribute)
 
     return product_type
-
-
-@pytest.fixture
-def brand(db):
-    brand = Brand.objects.create(name="default")
-    return brand
 
 
 @pytest.fixture
@@ -91,12 +72,21 @@ def product_attribute(db):
 
 
 @pytest.fixture
-def product_attribute_value(db, product_attribute):
-    product_attribute_value = ProductAttributeValue.objects.create(
-        product_attribute=product_attribute,
-        attribute_value="default",
+def single_product(db, category_with_child):
+    product = Product.objects.create(
+        web_id="123456789",
+        slug="default",
+        name="default",
+        category=category_with_child,
+        is_active=True,
     )
-    return product_attribute_value
+    return product
+
+
+@pytest.fixture
+def brand(db):
+    brand = Brand.objects.create(name="default")
+    return brand
 
 
 @pytest.fixture
@@ -114,8 +104,6 @@ def single_sub_product_with_media_and_attributes(
         is_default=True,
         retail_price="199.99",
         store_price="99.99",
-        sale_price="9.99",
-        is_on_sale=False,
         is_digital=False,
         weight=1000.0,
     )
@@ -135,3 +123,12 @@ def single_sub_product_with_media_and_attributes(
         "media": media,
         "attribute": product_attribute_value,
     }
+
+
+@pytest.fixture
+def product_attribute_value(db, product_attribute):
+    product_attribute_value = ProductAttributeValue.objects.create(
+        product_attribute=product_attribute,
+        attribute_value="default",
+    )
+    return product_attribute_value
