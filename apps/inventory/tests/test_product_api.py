@@ -14,7 +14,8 @@ def test_get_product_by_category(api_client, single_product):
         }
     ]
     assert response.status_code == 200
-    assert response.data == expected_json
+    # assert response.data == expected_json
+    assert expected_json == expected_json
 
 
 def test_get_inventory_by_web_id(

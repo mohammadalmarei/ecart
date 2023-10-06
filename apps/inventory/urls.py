@@ -4,7 +4,10 @@ from .views import (
     CategoryList,
     ProductByCategory,
     ProductInventoryByWebId,
+    AllProductInventory,
     SearchProductInventory,
+    ProductByStock,
+    AllProducts,
 )
 
 urlpatterns = [
@@ -13,6 +16,9 @@ urlpatterns = [
         "products/category/<str:query>/",
         ProductByCategory.as_view(),
     ),
-    path("<int:query>/", ProductInventoryByWebId.as_view()),
-    path("<str:query>/", SearchProductInventory.as_view()),
+    path("products/all/", AllProductInventory.as_view()),
+    path("product/all/", AllProducts.as_view()),
+    path("<str:query>/", ProductInventoryByWebId.as_view()),
+    path("product/search/<str:query>/", SearchProductInventory.as_view()),
+    path("products/highest-sold/", ProductByStock.as_view()),
 ]

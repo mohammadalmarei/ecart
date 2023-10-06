@@ -31,8 +31,8 @@ class ProductByCategory(APIView):
     """
 
     def get(self, request, query=None):
-        queryset = Product.objects.filter(category__slug=query)
-        serializer = ProductSerializer(queryset, many=True)
+        queryset = ProductInventory.objects.filter(product_id__category_id__slug=query)
+        serializer = ProductInventorySerializer(queryset, many=True)
         return Response(serializer.data)
 
 
@@ -43,6 +43,41 @@ class ProductInventoryByWebId(APIView):
 
     def get(self, request, query=None):
         queryset = ProductInventory.objects.filter(product__web_id=query)
+        serializer = ProductInventorySerializer(queryset, many=True)
+        return Response(serializer.data)
+
+
+class AllProductInventory(APIView):
+    """
+    Return Sub Product by WebId
+    """
+
+    def get(self, request):
+        queryset = ProductInventory.objects.all()[:20]
+        serializer = ProductInventorySerializer(queryset, many=True)
+        return Response(serializer.data)
+
+
+class AllProducts(APIView):
+    """
+    Return Sub Product by
+    """
+
+    def get(self, request):
+        queryset = Product.objects.all()
+        serializer = ProductSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+
+class ProductByStock(APIView):
+    """
+    Return Product by Stock
+    """
+
+    def get(self, request):
+        queryset = ProductInventory.objects.all().order_by(
+            "product_inventory__units_sold"
+        )[:3]
         serializer = ProductInventorySerializer(queryset, many=True)
         return Response(serializer.data)
 

@@ -113,6 +113,9 @@ class ProductAttributeValue(models.Model):
         max_length=255,
     )
 
+    def __str__(self):
+        return f"{self.product_attribute} - {self.attribute_value}"
+
 
 class ProductInventory(models.Model):
     sku = models.CharField(
@@ -166,17 +169,22 @@ class ProductInventory(models.Model):
         auto_now=True,
     )
 
-    def __str__(self):
-        return self.sku
+    class Meta:
+        verbose_name_plural = _("Product Inventory")
 
 
 class Media(models.Model):
+    def upload_to(instance, filename):
+        return "products/{filename}".format(filename=filename)
+
     product_inventory = models.ForeignKey(
         ProductInventory,
         on_delete=models.PROTECT,
         related_name="media",
     )
-    img_url = models.ImageField()
+    img_url = models.ImageField(
+        _("Image"), upload_to=upload_to, default="products/default.jpg"
+    )
     alt_text = models.CharField(
         max_length=255,
     )
@@ -190,6 +198,12 @@ class Media(models.Model):
     updated_at = models.DateTimeField(
         auto_now=True,
     )
+
+    class Meta:
+        verbose_name_plural = _("Media")
+
+    def __str__(self):
+        return str(self.product_inventory.id)
 
 
 class Stock(models.Model):
@@ -209,6 +223,9 @@ class Stock(models.Model):
         default=0,
     )
 
+    class Meta:
+        verbose_name_plural = _("Stock")
+
 
 class ProductAttributeValues(models.Model):
     attributevalues = models.ForeignKey(
@@ -224,6 +241,10 @@ class ProductAttributeValues(models.Model):
 
     class Meta:
         unique_together = (("attributevalues", "productinventory"),)
+        verbose_name_plural = _("Products attributes values")
+
+    def __str__(self):
+        return f"{self.attributevalues} - {self.productinventory}"
 
 
 class ProductTypeAttribute(models.Model):
@@ -240,3 +261,6 @@ class ProductTypeAttribute(models.Model):
 
     class Meta:
         unique_together = (("product_attribute", "product_type"),)
+
+    def __str__(self):
+        return f"{self.product_attribute} - {self.product_type}"

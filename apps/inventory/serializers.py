@@ -4,29 +4,15 @@ from django.db.models import Q
 from rest_framework import serializers
 
 from apps.inventory.models import (
-    Brand,
     Category,
-    Media,
     Product,
-    ProductAttributeValue,
     ProductInventory,
+    Brand,
+    Media,
+    ProductAttributeValue,
+    Stock,
 )
 from apps.promotion.models import Promotion
-
-
-class ProductAttributeValueSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ProductAttributeValue
-        depth = 2
-        exclude = ["id"]
-        read_only = True
-
-
-class BrandSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Brand
-        fields = ["name"]
-        read_only = True
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -44,6 +30,13 @@ class ProductSerializer(serializers.ModelSerializer):
         editable = False
 
 
+class BrandSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Brand
+        fields = ["name"]
+        read_only = True
+
+
 class ProductMediaSerializer(serializers.ModelSerializer):
     img_url = serializers.SerializerMethodField()
 
@@ -55,6 +48,21 @@ class ProductMediaSerializer(serializers.ModelSerializer):
 
     def get_img_url(self, obj):
         return obj.img_url.url
+
+
+class ProductAttributeValueSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductAttributeValue
+        depth = 2
+        exclude = ["id"]
+        read_only = True
+
+
+class StockSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Stock
+        exclude = ["id"]
+        read_only = True
 
 
 class ProductInventorySerializer(serializers.ModelSerializer):
